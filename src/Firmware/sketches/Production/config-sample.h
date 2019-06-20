@@ -29,7 +29,15 @@
 // Uncomment if on the board is an onboard LED
 #define PIN_STATUSLED                  LED_BUILTIN
 
+/**
+ * Pin configuration for the channels
+
+ * For Wemos D1 mini:
+ * The pin "D4" can't be used for a channel because this port is used
+ * by the onboard status LED. Use "D0" instead.
+ */
+
 #define PIN_CHANNEL_1                  D1
 #define PIN_CHANNEL_2                  D2
 #define PIN_CHANNEL_3                  D3
-#define PIN_CHANNEL_4                  D4
+#define PIN_CHANNEL_4                  D0
