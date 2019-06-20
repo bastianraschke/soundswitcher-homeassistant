@@ -79,7 +79,7 @@ void setupSwitches() {
 
     // Initially switch channel
     currentChannel = 1;
-    switchChannel(currentChannel);
+    switchCurrentChannel();
 }
 
 void setupMQTT() {
@@ -102,7 +102,7 @@ void onMessageReceivedCallback(char* topic, byte* payload, unsigned int length) 
         Serial.printf("onMessageReceivedCallback(): Received message on channel '%s': %s\n", topic, payloadMessage);
 
         if (updateValuesAccordingMessage(payloadMessage)) {
-            switchChannel(currentChannel);
+            switchCurrentChannel();
             publishState();
         } else {
             Serial.println("onMessageReceivedCallback(): The payload could not be parsed!");
@@ -124,8 +124,8 @@ bool updateValuesAccordingMessage(char* payload) {
     return wasSuccessfulParsed;
 }
 
-void switchChannel(const int channelNumber) {
-    switch (channelNumber) {
+void switchCurrentChannel() {
+    switch (currentChannel) {
         case 1:
             digitalWrite(PIN_CHANNEL_1, HIGH);
             digitalWrite(PIN_CHANNEL_2, LOW);
