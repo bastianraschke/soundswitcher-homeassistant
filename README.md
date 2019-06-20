@@ -13,6 +13,7 @@ The firmware must be configured before flashing to ESP8266. Rename `src/Firmware
           - 1
           - 2
           - 3
+          - 4
         initial: 1
         icon: mdi:speaker
 

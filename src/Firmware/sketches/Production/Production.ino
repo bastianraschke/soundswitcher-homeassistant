@@ -75,6 +75,7 @@ void setupSwitches() {
     pinMode(PIN_CHANNEL_1, OUTPUT);
     pinMode(PIN_CHANNEL_2, OUTPUT);
     pinMode(PIN_CHANNEL_3, OUTPUT);
+    pinMode(PIN_CHANNEL_4, OUTPUT);
 
     // Initially switch channel
     currentChannel = 1;
@@ -114,7 +115,7 @@ bool updateValuesAccordingMessage(char* payload) {
 
     const int channelNumberFromPayload = atoi(payload);
 
-    if (channelNumberFromPayload >= 1 && channelNumberFromPayload <= 3) {
+    if (channelNumberFromPayload >= 1 && channelNumberFromPayload <= 4) {
         currentChannel = channelNumberFromPayload;
     } else {
         wasSuccessfulParsed = false;
@@ -129,16 +130,25 @@ void switchChannel(const int channelNumber) {
             digitalWrite(PIN_CHANNEL_1, HIGH);
             digitalWrite(PIN_CHANNEL_2, LOW);
             digitalWrite(PIN_CHANNEL_3, LOW);
+            digitalWrite(PIN_CHANNEL_4, LOW);
             break;
         case 2:
             digitalWrite(PIN_CHANNEL_1, LOW);
             digitalWrite(PIN_CHANNEL_2, HIGH);
             digitalWrite(PIN_CHANNEL_3, LOW);
+            digitalWrite(PIN_CHANNEL_4, LOW);
             break;
         case 3:
             digitalWrite(PIN_CHANNEL_1, LOW);
             digitalWrite(PIN_CHANNEL_2, LOW);
             digitalWrite(PIN_CHANNEL_3, HIGH);
+            digitalWrite(PIN_CHANNEL_4, LOW);
+            break;
+        case 4:
+            digitalWrite(PIN_CHANNEL_1, LOW);
+            digitalWrite(PIN_CHANNEL_2, LOW);
+            digitalWrite(PIN_CHANNEL_3, LOW);
+            digitalWrite(PIN_CHANNEL_4, HIGH);
             break;
     }
 }

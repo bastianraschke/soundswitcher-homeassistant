@@ -32,3 +32,4 @@
 #define PIN_CHANNEL_1                  D1
 #define PIN_CHANNEL_2                  D2
 #define PIN_CHANNEL_3                  D3
+#define PIN_CHANNEL_4                  D4
