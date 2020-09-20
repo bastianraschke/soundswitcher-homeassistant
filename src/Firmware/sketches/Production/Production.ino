@@ -107,10 +107,7 @@ void onMessageReceivedCallback(char* topic, byte* payload, unsigned int length) 
 
         Serial.printf("onMessageReceivedCallback(): Received message on channel '%s': %s\n", topic, payloadMessage);
 
-        if (updateValuesAccordingMessage(payloadMessage)) {
-            switchCurrentChannel();
-            publishState();
-        } else {
+        if (!updateValuesAccordingMessage(payloadMessage)) {
             Serial.println("onMessageReceivedCallback(): The payload could not be parsed!");
         }
     }
@@ -122,7 +119,12 @@ bool updateValuesAccordingMessage(char* payload) {
     const int channelNumberFromPayload = atoi(payload);
 
     if (channelNumberFromPayload >= 1 && channelNumberFromPayload <= 4) {
-        currentChannel = channelNumberFromPayload;
+        if (channelNumberFromPayload != currentChannel) {
+            currentChannel = channelNumberFromPayload;
+
+            switchCurrentChannel();
+            publishState();
+        }
     } else {
         wasSuccessfulParsed = false;
     }
