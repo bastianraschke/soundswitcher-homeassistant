@@ -3,11 +3,12 @@
 
 #include "config.h"
 
-#define FIRMWARE_VERSION  "1.0.0"
+#define FIRMWARE_VERSION  "1.1.0"
 
 WiFiClientSecure secureWifiClient = WiFiClientSecure();
 PubSubClient mqttClient = PubSubClient(secureWifiClient, MQTT_SERVER_TLS_FINGERPRINT);
 
+int oldButtonState = LOW;
 int currentChannel = 0;
 
 /*
@@ -28,7 +29,8 @@ void setup() {
     #endif
 
     setupWifi();
-    setupSwitches();
+    setupSelectButton();
+    setupAudioRelays();
     setupMQTT();
 }
 
@@ -69,8 +71,12 @@ void blinkStatusLED(const int times) {
     #endif
 }
 
-void setupSwitches() {
-    Serial.println("setupSwitches(): Setup switches...");
+void setupSelectButton() {
+     pinMode(PIN_BUTTON, INPUT);
+}
+
+void setupAudioRelays() {
+    Serial.println("setupAudioRelays(): Setup relais...");
 
     pinMode(PIN_CHANNEL_1, OUTPUT);
     pinMode(PIN_CHANNEL_2, OUTPUT);
@@ -159,8 +165,27 @@ void publishState() {
 }
 
 void loop() {
+    switchChannelOnButtonChange();
     connectMQTT();
     mqttClient.loop();
+}
+
+void switchChannelOnButtonChange() {
+    const int newButtonState = digitalRead(PIN_BUTTON);
+    const bool buttonIsPressed = (newButtonState == HIGH);
+
+    if (newButtonState != oldButtonState) {
+        if (buttonIsPressed) {
+            currentChannel = currentChannel % 4 + 1;
+
+            Serial.printf("switchChannelOnButtonChange(): Switch to channel %d\n", currentChannel);
+
+            switchCurrentChannel();
+            publishState();
+        }
+
+        oldButtonState = newButtonState;
+    }
 }
 
 void connectMQTT() {

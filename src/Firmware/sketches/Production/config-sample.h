@@ -29,6 +29,8 @@
 // Uncomment if on the board is an onboard LED
 #define PIN_STATUSLED                  LED_BUILTIN
 
+#define PIN_BUTTON                     D5
+
 /**
  * Pin configuration for the channels
 
