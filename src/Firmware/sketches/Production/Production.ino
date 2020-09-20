@@ -3,10 +3,13 @@
 
 #include "config.h"
 
-#define FIRMWARE_VERSION  "1.0.0"
+#define FIRMWARE_VERSION  "1.1.0"
 
 WiFiClientSecure secureWifiClient = WiFiClientSecure();
 PubSubClient mqttClient = PubSubClient(secureWifiClient, MQTT_SERVER_TLS_FINGERPRINT);
+
+int oldButtonState = LOW;
+unsigned long lastButtonStateChange = 0;
 
 int currentChannel = 0;
 
@@ -28,7 +31,8 @@ void setup() {
     #endif
 
     setupWifi();
-    setupSwitches();
+    setupSelectButton();
+    setupAudioRelays();
     setupMQTT();
 }
 
@@ -69,8 +73,12 @@ void blinkStatusLED(const int times) {
     #endif
 }
 
-void setupSwitches() {
-    Serial.println("setupSwitches(): Setup switches...");
+void setupSelectButton() {
+     pinMode(PIN_BUTTON, INPUT);
+}
+
+void setupAudioRelays() {
+    Serial.println("setupAudioRelays(): Setup relais...");
 
     pinMode(PIN_CHANNEL_1, OUTPUT);
     pinMode(PIN_CHANNEL_2, OUTPUT);
@@ -101,10 +109,7 @@ void onMessageReceivedCallback(char* topic, byte* payload, unsigned int length) 
 
         Serial.printf("onMessageReceivedCallback(): Received message on channel '%s': %s\n", topic, payloadMessage);
 
-        if (updateValuesAccordingMessage(payloadMessage)) {
-            switchCurrentChannel();
-            publishState();
-        } else {
+        if (!updateValuesAccordingMessage(payloadMessage)) {
             Serial.println("onMessageReceivedCallback(): The payload could not be parsed!");
         }
     }
@@ -116,7 +121,12 @@ bool updateValuesAccordingMessage(char* payload) {
     const int channelNumberFromPayload = atoi(payload);
 
     if (channelNumberFromPayload >= 1 && channelNumberFromPayload <= 4) {
-        currentChannel = channelNumberFromPayload;
+        if (channelNumberFromPayload != currentChannel) {
+            currentChannel = channelNumberFromPayload;
+
+            switchCurrentChannel();
+            publishState();
+        }
     } else {
         wasSuccessfulParsed = false;
     }
@@ -159,8 +169,30 @@ void publishState() {
 }
 
 void loop() {
+    switchChannelOnButtonChange();
     connectMQTT();
     mqttClient.loop();
+}
+
+void switchChannelOnButtonChange() {
+    const int newButtonState = digitalRead(PIN_BUTTON);
+    const bool buttonDebounceCheckFulfilled = millis() - lastButtonStateChange >= 250;
+
+    if (newButtonState != oldButtonState && buttonDebounceCheckFulfilled) {
+        const bool buttonIsPressed = (newButtonState == HIGH);
+
+        if (buttonIsPressed) {
+            currentChannel = currentChannel % 4 + 1;
+
+            Serial.printf("switchChannelOnButtonChange(): Switch to channel %d\n", currentChannel);
+
+            switchCurrentChannel();
+            publishState();
+        }
+
+        oldButtonState = newButtonState;
+        lastButtonStateChange = millis();
+    }
 }
 
 void connectMQTT() {
