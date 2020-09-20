@@ -9,6 +9,8 @@ WiFiClientSecure secureWifiClient = WiFiClientSecure();
 PubSubClient mqttClient = PubSubClient(secureWifiClient, MQTT_SERVER_TLS_FINGERPRINT);
 
 int oldButtonState = LOW;
+unsigned long lastButtonStateChange = 0;
+
 int currentChannel = 0;
 
 /*
@@ -174,9 +176,11 @@ void loop() {
 
 void switchChannelOnButtonChange() {
     const int newButtonState = digitalRead(PIN_BUTTON);
-    const bool buttonIsPressed = (newButtonState == HIGH);
+    const bool buttonDebounceCheckFulfilled = millis() - lastButtonStateChange >= 250;
 
-    if (newButtonState != oldButtonState) {
+    if (newButtonState != oldButtonState && buttonDebounceCheckFulfilled) {
+        const bool buttonIsPressed = (newButtonState == HIGH);
+
         if (buttonIsPressed) {
             currentChannel = currentChannel % 4 + 1;
 
@@ -187,6 +191,7 @@ void switchChannelOnButtonChange() {
         }
 
         oldButtonState = newButtonState;
+        lastButtonStateChange = millis();
     }
 }
 
