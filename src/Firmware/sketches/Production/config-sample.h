@@ -11,6 +11,8 @@
 #define WIFI_SSID                      ""
 #define WIFI_PASSWORD                  ""
 
+#define WIFI_CONNECTION_MAX_TRIES      10
+
 #define MQTT_CLIENTID                  SOUNDSWITCHER_NODE_ID
 
 // Put the host/IPv4 address of your MQTT broker here
@@ -22,6 +24,8 @@
 #define MQTT_PORT                      8883
 #define MQTT_USERNAME                  SOUNDSWITCHER_NODE_ID
 #define MQTT_PASSWORD                  ""
+
+#define MQTT_CONNECTION_MAX_TRIES      10
 
 #define MQTT_CHANNEL_STATE             "/soundswitcher/api/1/id/AAAABBBB/state/"
 #define MQTT_CHANNEL_COMMAND           "/soundswitcher/api/1/id/AAAABBBB/command/"

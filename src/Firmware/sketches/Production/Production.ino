@@ -3,10 +3,13 @@
 
 #include "config.h"
 
-#define FIRMWARE_VERSION  "1.1.0"
+#define FIRMWARE_VERSION  "1.2.0"
 
 WiFiClientSecure secureWifiClient = WiFiClientSecure();
 PubSubClient mqttClient = PubSubClient(secureWifiClient, MQTT_SERVER_TLS_FINGERPRINT);
+
+int wifiConnectionTimeoutCounter = 0;
+int mqttConnectionTimeoutCounter = 0;
 
 int oldButtonState = LOW;
 unsigned long lastButtonStateChange = 0;
@@ -48,6 +51,13 @@ void setupWifi() {
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
     while (WiFi.status() != WL_CONNECTED) {
+        wifiConnectionTimeoutCounter++;
+
+        if (wifiConnectionTimeoutCounter == WIFI_CONNECTION_MAX_TRIES) {
+            Serial.println(F("setupWifi(): Connection failed!"));
+            break;
+        }
+
         // Blink 2 times when connecting
         blinkStatusLED(2);
 
@@ -55,8 +65,10 @@ void setupWifi() {
         Serial.println(F("setupWifi(): Connecting..."));
     }
 
-    Serial.print(F("setupWifi(): Connected to Wi-Fi access point. Obtained IP address: "));
-    Serial.println(WiFi.localIP());
+    if (WiFi.status() == WL_CONNECTED) {
+        Serial.print(F("setupWifi(): Connected to Wi-Fi access point. Obtained IP address: "));
+        Serial.println(WiFi.localIP());
+    }
 }
 
 void blinkStatusLED(const int times) {
@@ -200,6 +212,10 @@ void connectMQTT() {
         return ;
     }
 
+    if (wifiConnectionTimeoutCounter == WIFI_CONNECTION_MAX_TRIES || mqttConnectionTimeoutCounter == MQTT_CONNECTION_MAX_TRIES) {
+        return ;
+    }
+
     Serial.printf("connectMQTT(): Connecting to MQTT broker '%s:%i'...\n", MQTT_SERVER, MQTT_PORT);
 
     while (mqttClient.connected() == false) {
@@ -214,6 +230,13 @@ void connectMQTT() {
             // Initially publish current state
             publishState();
         } else {
+            mqttConnectionTimeoutCounter++;
+
+            if (mqttConnectionTimeoutCounter == MQTT_CONNECTION_MAX_TRIES) {
+                Serial.println(F("connectMQTT(): Connection failed!"));
+                break;
+            }
+
             Serial.printf("connectMQTT(): Connection failed with error code %i. Try again...\n", mqttClient.state());
             blinkStatusLED(3);
             delay(500);
