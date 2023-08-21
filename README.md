@@ -18,7 +18,7 @@ The firmware must be configured before flashing to ESP8266. Rename `src/Firmware
 
 ### Flash settings
 
-* **Arduino IDE:** 1.8.15
+* **Arduino IDE:** 2.1.1
 * **Platform:** esp8266 2.4.2
 * **Board:** LOLIN (WEMOS) D1 R2 & mini
 * **Flash Size**: 4M (1M SPIFFS)
@@ -31,37 +31,19 @@ The firmware must be configured before flashing to ESP8266. Rename `src/Firmware
 
 ## Example configuration for Home Assistant
 
-    input_select:
-      soundswitcher:
-        name: Soundswitcher
+Tested with Home Assistant 2023.8.2.
+
+The example block must be added to the `mqtt` block of your configuration.
+
+    - select:
+        name: "Soundswitcher"
+        command_topic: "/soundswitcher/api/1/id/AAAABBBB/state/"
         options:
-          - 1
-          - 2
-          - 3
-          - 4
-        initial: 1
+          - "1"
+          - "2"
+          - "3"
+          - "4"
         icon: mdi:speaker
-
-    automation:
-      - alias: "Get soundswitcher state"
-        trigger:
-          platform: mqtt
-          topic: "/soundswitcher/api/1/id/AAAABBBB/state/"
-        action:
-          service: input_select.select_option
-          data_template:
-            entity_id: input_select.soundswitcher
-            option: "{{ trigger.payload }}"
-
-      - alias: "Set soundswitcher state"
-        trigger:
-          platform: state
-          entity_id: input_select.soundswitcher
-        action:
-          service: mqtt.publish
-          data:
-            topic: "/soundswitcher/api/1/id/AAAABBBB/command/"
-            payload_template: "{{ states('input_select.soundswitcher') }}"
 
 ## Further information
 

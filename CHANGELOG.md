@@ -1,5 +1,11 @@
 # MQTT Sound Switcher changelog
 
+## [1.2.1] - 2023-08-21
+
+### Updated
+- Updated Arduino IDE version to 2.1.1
+- Documentation in readme to support latest Home Assistant
+
 ## [1.2.0] - 2021-09-29
 
 ### Changed
