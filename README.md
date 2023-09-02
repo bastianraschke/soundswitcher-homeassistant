@@ -37,7 +37,8 @@ The example block must be added to the `mqtt` block of your configuration.
 
     - select:
         name: "Soundswitcher"
-        command_topic: "/soundswitcher/api/1/id/AAAABBBB/state/"
+        state_topic: "/soundswitcher/api/1/id/AAAABBBB/state/"
+        command_topic: "/soundswitcher/api/1/id/AAAABBBB/command/"
         options:
           - "1"
           - "2"

@@ -1,5 +1,10 @@
 # MQTT Sound Switcher changelog
 
+## [1.2.2] - 2023-09-02
+
+### Fixed
+- Wrong documentation in readme to support latest Home Assistant
+
 ## [1.2.1] - 2023-08-21
 
 ### Updated
