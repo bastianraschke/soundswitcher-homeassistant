@@ -18,7 +18,7 @@ The firmware must be configured before flashing to ESP8266. Rename `src/Firmware
 
 ### Flash settings
 
-* **Arduino IDE:** 2.1.1
+* **Arduino IDE:** 2.2.1
 * **Platform:** esp8266 2.4.2
 * **Board:** LOLIN (WEMOS) D1 R2 & mini
 * **Flash Size**: 4M (1M SPIFFS)
